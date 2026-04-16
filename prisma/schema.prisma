@@ -1,0 +1,53 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+model Property {
+  id        String   @id @default(cuid())
+  address   String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  units     Unit[]
+}
+
+model Unit {
+  id          String    @id @default(cuid())
+  propertyId  String
+  unitName    String
+  tenantName  String
+  monthlyRent Float
+  property    Property  @relation(fields: [propertyId], references: [id], onDelete: Cascade)
+  payments    Payment[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Payment {
+  id          String   @id @default(cuid())
+  unitId      String
+  amount      Float
+  paymentDate DateTime
+  method      String
+  status      String   @default("pending")
+  reference   String?
+  notes       String?
+  unit        Unit     @relation(fields: [unitId], references: [id])
+  createdAt   DateTime @default(now())
+}
+
+model PlaidItem {
+  id            String   @id @default(cuid())
+  itemId        String   @unique
+  accessToken   String
+  institutionId String?
+  institutionName String?
+  cursor        String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}

@@ -24,14 +24,14 @@ export default async function NewPaymentPage() {
   return (
     <div className="space-y-6 max-w-2xl">
       <div>
-        <Button variant="ghost" asChild className="mb-4 -ml-2">
+        <Button variant="ghost" asChild className="mb-4 -ml-2" size="sm">
           <Link href="/payments">
             <ArrowLeft className="h-4 w-4" /> Back to payments
           </Link>
         </Button>
-        <h1 className="text-3xl font-bold tracking-tight">Add payment</h1>
-        <p className="text-muted-foreground">
-          Record a check, wire, ACH, cash, or other manual payment.
+        <h1 className="text-3xl font-semibold tracking-tight">Log a payment</h1>
+        <p className="text-muted-foreground mt-1">
+          Record a check, wire, ACH, cash, or other manual rental payment.
         </p>
       </div>
 

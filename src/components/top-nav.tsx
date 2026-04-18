@@ -10,27 +10,37 @@ const nav = [
   { href: "/properties", label: "Props", icon: Building2 },
   { href: "/payments", label: "Pay", icon: Receipt },
   { href: "/reports", label: "Report", icon: BarChart3 },
-  { href: "/settings", label: "Settings", icon: Settings },
+  { href: "/settings", label: "More", icon: Settings },
 ];
 
 export function MobileNav() {
   const pathname = usePathname();
   return (
-    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t bg-card/95 backdrop-blur">
-      <ul className="grid grid-cols-5">
+    <nav className="md:hidden fixed bottom-0 inset-x-0 z-40 border-t bg-background/95 backdrop-blur-lg">
+      <ul className="grid grid-cols-5 px-2 pb-2 pt-1">
         {nav.map((item) => {
-          const active = pathname.startsWith(item.href);
+          const active =
+            pathname === item.href || pathname.startsWith(item.href + "/");
           const Icon = item.icon;
           return (
             <li key={item.href}>
               <Link
                 href={item.href}
                 className={cn(
-                  "flex flex-col items-center gap-1 py-2 text-xs",
-                  active ? "text-primary" : "text-muted-foreground"
+                  "flex flex-col items-center gap-1 py-2 text-[10px] font-medium rounded-lg transition-colors",
+                  active
+                    ? "text-primary"
+                    : "text-muted-foreground hover:text-foreground"
                 )}
               >
-                <Icon className="h-5 w-5" />
+                <div
+                  className={cn(
+                    "h-6 w-10 rounded-full flex items-center justify-center transition-colors",
+                    active && "bg-primary/10"
+                  )}
+                >
+                  <Icon className="h-5 w-5" />
+                </div>
                 {item.label}
               </Link>
             </li>

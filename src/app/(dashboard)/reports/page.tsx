@@ -25,11 +25,17 @@ export const dynamic = "force-dynamic";
 
 export default async function ReportsPage() {
   const now = new Date();
+  const twelveMonthsAgo = startOfMonth(subMonths(now, 11));
 
   const properties = await prisma.property.findMany({
     include: {
       units: {
-        include: { payments: true },
+        include: {
+          payments: {
+            where: { paymentDate: { gte: twelveMonthsAgo } },
+            orderBy: { paymentDate: "desc" },
+          },
+        },
       },
     },
     orderBy: { address: "asc" },

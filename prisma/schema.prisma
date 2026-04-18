@@ -25,6 +25,8 @@ model Unit {
   payments    Payment[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
+
+  @@index([propertyId])
 }
 
 model Payment {
@@ -38,6 +40,10 @@ model Payment {
   notes       String?
   unit        Unit     @relation(fields: [unitId], references: [id])
   createdAt   DateTime @default(now())
+
+  @@index([unitId])
+  @@index([paymentDate])
+  @@index([status])
 }
 
 model PlaidItem {

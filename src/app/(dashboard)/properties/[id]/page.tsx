@@ -50,12 +50,19 @@ export default async function PropertyDetailPage({
   const now = new Date();
   const { start, end } = monthBounds(now);
 
+  // Only need current-month payments (for status/collected) + the most
+  // recent payment per unit (for the "last payment" column).
+  const recentCutoff = new Date(now.getFullYear(), now.getMonth() - 3, 1);
   const property = await prisma.property.findUnique({
     where: { id },
     include: {
       units: {
         include: {
-          payments: { orderBy: { paymentDate: "desc" } },
+          payments: {
+            where: { paymentDate: { gte: recentCutoff } },
+            orderBy: { paymentDate: "desc" },
+            take: 20,
+          },
         },
         orderBy: { unitName: "asc" },
       },

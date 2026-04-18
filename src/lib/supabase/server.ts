@@ -1,27 +1,19 @@
-import { createServerClient } from "@supabase/ssr";
-import { cookies } from "next/headers";
+// Local-dev stub: returns a fake authenticated user so API routes work
+// without Supabase. Replace with real Supabase client before production.
+const LOCAL_USER = { id: "local-owner", email: "owner@localhost" };
 
 export async function createClient() {
-  const cookieStore = await cookies();
-
-  return createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    {
-      cookies: {
-        getAll() {
-          return cookieStore.getAll();
-        },
-        setAll(cookiesToSet) {
-          try {
-            cookiesToSet.forEach(({ name, value, options }) =>
-              cookieStore.set(name, value, options)
-            );
-          } catch {
-            // Called from a Server Component - safe to ignore, middleware refreshes session
-          }
-        },
+  return {
+    auth: {
+      async getUser() {
+        return { data: { user: LOCAL_USER }, error: null };
       },
-    }
-  );
+      async signOut() {
+        return { error: null };
+      },
+      async exchangeCodeForSession(_code: string) {
+        return { data: { session: null }, error: null };
+      },
+    },
+  };
 }

@@ -13,29 +13,39 @@ export default async function DashboardLayout({
   const now = new Date();
   const { start, end } = monthBounds(now);
 
-  const [propertyCount, unitAgg, collectedAgg] = await Promise.all([
-    prisma.property.count(),
-    prisma.unit.aggregate({
-      _count: { _all: true },
-      _sum: { monthlyRent: true },
-    }),
-    prisma.payment.aggregate({
-      _sum: { amount: true },
-      where: {
-        paymentDate: { gte: start, lt: end },
-        status: { not: "failed" },
+  const properties = await prisma.property.findMany({
+    include: {
+      units: {
+        include: {
+          payments: {
+            where: { paymentDate: { gte: start, lt: end } },
+          },
+        },
       },
-    }),
-  ]);
+    },
+  });
+
+  let monthlyPotential = 0;
+  let collected = 0;
+  let units = 0;
+  for (const p of properties) {
+    for (const u of p.units) {
+      units++;
+      monthlyPotential += u.monthlyRent;
+      for (const pay of u.payments) {
+        if (pay.status !== "failed") collected += pay.amount;
+      }
+    }
+  }
 
   return (
     <div className="min-h-screen flex bg-muted/40">
       <Sidebar
         summary={{
-          properties: propertyCount,
-          units: unitAgg._count._all,
-          monthlyPotential: unitAgg._sum.monthlyRent ?? 0,
-          collected: collectedAgg._sum.amount ?? 0,
+          properties: properties.length,
+          units,
+          monthlyPotential,
+          collected,
         }}
       />
       <main className="flex-1 pb-24 md:pb-0">
